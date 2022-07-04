@@ -2,27 +2,26 @@ import { DOCUMENT } from '@angular/common';
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Friend } from '../../models/friend';
-import { Loader } from '@googlemaps/js-api-loader'
-import { MarkerClusterer } from '@googlemaps/markerclusterer'
+import { Loader } from '@googlemaps/js-api-loader';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 
 @Component({
   selector: 'app-friend-map',
-  templateUrl: '<div class="w-full h-[60vh]" id="googlemap"></div>',
-  styleUrls: [':host { display: block;}'],
+  templateUrl: './friend-map.component.html',
+  styleUrls: ['./friend-map.component.scss'],
 })
 export class FriendMapComponent implements OnInit {
-  private _friends: Friend[] = []
-  private mapDivElement: HTMLElement | null = null
-  private mapLoader: Loader
-  private map: google.maps.Map | null = null
-  private markers: google.maps.Marker[] = []
+  private _friends: Friend[] = [];
+  private mapDivElement: HTMLElement | null = null;
+  private mapLoader: Loader;
+  private map: google.maps.Map | null = null;
+  private markers: google.maps.Marker[] = [];
   private markerCluster: MarkerClusterer | null = null
 
   @Input() set friends(value: Friend[]) {
-    this._friends = value
-    // each time friends input updated, do these actions:
+    this._friends = value;
     this.resetMap()
-    this.loadMap()
+    this.loadMap();
   }
 
   constructor(@Inject(DOCUMENT) private document: Document) {
@@ -32,21 +31,21 @@ export class FriendMapComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await this.mapLoader.load()
+    await this.mapLoader.load();
 
-    this.mapDivElement = this.document.getElementById('googlemap')
+    this.mapDivElement = this.document.getElementById('googlemap');
     if (this.mapDivElement) {
       this.map = new google.maps.Map(this.mapDivElement, {
-        center: { lat: 48.13743, lng: 11.57549},
+        center: { lat: 48.13743, lng: 11.57549 },
         zoom: 2,
       });
     }
 
-    this.loadMap()
+    this.loadMap();
   }
 
   private loadMap() {
-    if (!this.map) return
+    if (!this.map) return;
 
     const infoWindow = new google.maps.InfoWindow({
       content: '',
@@ -54,15 +53,14 @@ export class FriendMapComponent implements OnInit {
     });
 
     this.markers = []
+
     this.markers = this._friends.map((friend) => {
-      return this.getFriendMarker(infoWindow, friend)
+      return this.getFriendMarker(infoWindow, friend);
     });
 
     this.setMapOnAllMarkers(this.map)
     if (this.markers) {
-      this.markerCluster = new MarkerClusterer({
-        markers: this.markers, map: this.map
-      });
+      this.markerCluster = new MarkerClusterer({ markers: this.markers, map: this.map });
     }
   }
 
@@ -73,27 +71,29 @@ export class FriendMapComponent implements OnInit {
 
   private setMapOnAllMarkers(map: google.maps.Map | null) {
     this.markers.forEach((marker) => {
-      marker.setMap(map)
-    })
+      marker.setMap(map);
+    });
   }
 
   private getFriendMarker(
     infoWindow: google.maps.InfoWindow,
     friend: Friend
   ): google.maps.Marker {
-    const content = `${friend.firstName} ${friend.lastName}`
-
+    const content = `
+    ${friend.firstName} ${friend.lastName}<br>
+    ${friend.jobTitle} at ${friend.company}<br>
+    Phone: ${friend.phone}
+    `
     const marker = new google.maps.Marker({
       position: friend.location,
       label: (friend.firstName[0] + friend.lastName[0]).toUpperCase(),
     });
 
-    // marker popup on click
     marker.addListener('click', () => {
-      infoWindow.setContent(content),
-      infoWindow.open(this.map, marker)
+      infoWindow.setContent(content);
+      infoWindow.open(this.map, marker);
     });
-    
+
     return marker;
   }
 
