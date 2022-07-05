@@ -1,20 +1,18 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { CoreModule } from './core/core.module';
 
-import { AppComponent } from './app.component';
-import { HomePageComponent } from './pages/home-page/home-page.component';
 import { AppRoutingModule } from './app-routing.module';
-import { FriendMapComponent } from './features/friends/components/friend-map/friend-map.component';
+import { AppComponent } from './app.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomePageComponent,
-    FriendMapComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    CoreModule,
+    AppRoutingModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
